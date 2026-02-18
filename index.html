@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
     :root {
@@ -633,11 +634,32 @@
       color: #fff;
     }
 
-    .pdf-frame {
+    .pdf-container {
       flex: 1;
-      width: 100%;
-      border: none;
-      background: #fff;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #e8e8e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+    }
+
+    .pdf-container canvas {
+      max-width: 100%;
+      height: auto !important;
+      display: block;
+    }
+
+    .pdf-loading {
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 18px;
     }
 
     .close-btn {
@@ -786,7 +808,9 @@
       <span style="font-weight:900;">زاد الذاكر</span>
       <button class="close-btn" onclick="closeZad()">إغلاق ✕</button>
     </div>
-    <iframe id="pdfFrame" class="pdf-frame"></iframe>
+    <div id="pdfContainer" class="pdf-container">
+      <div class="pdf-loading">📖 اضغط لفتح زاد الذاكر</div>
+    </div>
   </div>
 
   <script>
@@ -960,74 +984,91 @@
       return tmp.innerHTML;
     }
 
-    // PDF Viewer Logic
+    // PDF Viewer Logic (using PDF.js for cross-device support)
     const PDF_LOCAL = "./zad.pdf";
-    const CACHE_KEY = "zad-pdf";
     const modal = document.getElementById("pdfModal");
-    const frame = document.getElementById("pdfFrame");
+    const pdfContainer = document.getElementById("pdfContainer");
+    let pdfLoaded = false;
+
+    // Configure PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
     async function openZad() {
       modal.classList.add("open");
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      if (isMobile) {
-        // Mobile: Use Google Docs Viewer (mobile browsers can't render PDF in iframe)
-        frame.srcdoc = "<div style='color:#333; display:flex; justify-content:center; align-items:center; height:100vh; font-family:Tajawal,sans-serif; font-size:18px;'>📖 جاري تحميل زاد الذاكر...</div>";
-        const pdfPublicUrl = new URL("zad.pdf", window.location.href).href;
-        const gviewUrl = "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(pdfPublicUrl);
-        frame.removeAttribute("srcdoc");
-        frame.src = gviewUrl;
-        return;
-      }
+      // Only load once
+      if (pdfLoaded) return;
 
-      // Desktop: Use blob approach (works natively)
-      // 1. Try cache first (instant open)
-      if ('caches' in window) {
-        try {
-          const cache = await caches.open("zad-cache-v1");
-          const cached = await cache.match(CACHE_KEY);
-          if (cached) {
-            const arrayBuf = await cached.arrayBuffer();
-            const blob = new Blob([arrayBuf], { type: "application/pdf" });
-            frame.src = URL.createObjectURL(blob);
-            return;
-          }
-        } catch (e) { }
-      }
+      pdfContainer.innerHTML = '<div class="pdf-loading">📖 جاري تحميل زاد الذاكر...</div>';
 
-      // 2. Show loading message
-      frame.srcdoc = "<div style='color:#333; display:flex; justify-content:center; align-items:center; height:100vh; font-family:Tajawal,sans-serif; font-size:18px;'>📖 جاري تحميل زاد الذاكر...</div>";
-
-      // 3. Fetch from local file
       try {
         const res = await fetch(PDF_LOCAL);
         if (!res.ok) throw new Error("Not found");
-
         const arrayBuf = await res.arrayBuffer();
 
-        // Cache it for offline use
+        // Cache for offline
         if ('caches' in window) {
-          const cache = await caches.open("zad-cache-v1");
-          const cacheRes = new Response(arrayBuf.slice(0), {
-            headers: { "Content-Type": "application/pdf" }
-          });
-          cache.put(CACHE_KEY, cacheRes);
+          try {
+            const cache = await caches.open("zad-cache-v1");
+            cache.put("zad-pdf", new Response(arrayBuf.slice(0), { headers: { "Content-Type": "application/pdf" } }));
+          } catch (e) { }
         }
 
-        // Display in iframe
-        const blob = new Blob([arrayBuf], { type: "application/pdf" });
-        frame.removeAttribute("srcdoc");
-        frame.src = URL.createObjectURL(blob);
+        // Render with PDF.js
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuf }).promise;
+        pdfContainer.innerHTML = "";
+
+        const containerWidth = pdfContainer.clientWidth - 8;
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const baseViewport = page.getViewport({ scale: 1 });
+          const scale = Math.min(2, containerWidth / baseViewport.width);
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement("canvas");
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          const ctx = canvas.getContext("2d");
+          await page.render({ canvasContext: ctx, viewport }).promise;
+          pdfContainer.appendChild(canvas);
+        }
+
+        pdfLoaded = true;
       } catch (e) {
-        // Fallback: open directly
-        frame.removeAttribute("srcdoc");
-        frame.src = PDF_LOCAL;
+        // Try from cache if fetch fails (offline)
+        try {
+          const cache = await caches.open("zad-cache-v1");
+          const cached = await cache.match("zad-pdf");
+          if (cached) {
+            const buf = await cached.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+            pdfContainer.innerHTML = "";
+            const containerWidth = pdfContainer.clientWidth - 8;
+            for (let i = 1; i <= pdf.numPages; i++) {
+              const page = await pdf.getPage(i);
+              const baseViewport = page.getViewport({ scale: 1 });
+              const scale = Math.min(2, containerWidth / baseViewport.width);
+              const viewport = page.getViewport({ scale });
+              const canvas = document.createElement("canvas");
+              canvas.width = viewport.width;
+              canvas.height = viewport.height;
+              await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+              pdfContainer.appendChild(canvas);
+            }
+            pdfLoaded = true;
+          } else {
+            throw new Error("No cache");
+          }
+        } catch (e2) {
+          pdfContainer.innerHTML = '<div class="pdf-loading" style="color:red;">❗ تعذر تحميل الملف</div>';
+        }
       }
     }
 
     function closeZad() {
       modal.classList.remove("open");
-      frame.src = ""; // Clear to stop memory usage
     }
 
     // Event delegation: catch all .zad-link clicks globally
