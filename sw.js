@@ -1,5 +1,5 @@
 /* Ramadan Accountability PWA - offline cache */
-const CACHE_NAME = "ramadan-pwa-v1";
+const CACHE_NAME = "ramadan-pwa-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -38,7 +38,7 @@ self.addEventListener("fetch", (event) => {
               const copy = res.clone();
               caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
             }
-          } catch (e) {}
+          } catch (e) { }
           return res;
         })
         .catch(() => (event.request.mode === "navigate" ? caches.match("./index.html") : undefined));
