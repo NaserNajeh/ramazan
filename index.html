@@ -968,7 +968,19 @@
 
     async function openZad() {
       modal.classList.add("open");
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
+      if (isMobile) {
+        // Mobile: Use Google Docs Viewer (mobile browsers can't render PDF in iframe)
+        frame.srcdoc = "<div style='color:#333; display:flex; justify-content:center; align-items:center; height:100vh; font-family:Tajawal,sans-serif; font-size:18px;'>📖 جاري تحميل زاد الذاكر...</div>";
+        const pdfPublicUrl = new URL("zad.pdf", window.location.href).href;
+        const gviewUrl = "https://docs.google.com/gview?embedded=true&url=" + encodeURIComponent(pdfPublicUrl);
+        frame.removeAttribute("srcdoc");
+        frame.src = gviewUrl;
+        return;
+      }
+
+      // Desktop: Use blob approach (works natively)
       // 1. Try cache first (instant open)
       if ('caches' in window) {
         try {
@@ -986,7 +998,7 @@
       // 2. Show loading message
       frame.srcdoc = "<div style='color:#333; display:flex; justify-content:center; align-items:center; height:100vh; font-family:Tajawal,sans-serif; font-size:18px;'>📖 جاري تحميل زاد الذاكر...</div>";
 
-      // 3. Fetch from local file (no CORS issues)
+      // 3. Fetch from local file
       try {
         const res = await fetch(PDF_LOCAL);
         if (!res.ok) throw new Error("Not found");
@@ -1007,7 +1019,7 @@
         frame.removeAttribute("srcdoc");
         frame.src = URL.createObjectURL(blob);
       } catch (e) {
-        // Fallback: open directly (browser will handle)
+        // Fallback: open directly
         frame.removeAttribute("srcdoc");
         frame.src = PDF_LOCAL;
       }
