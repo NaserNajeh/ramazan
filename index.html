@@ -7,7 +7,7 @@
   <title>محاسبة رمضان</title>
 
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0b5d4a">
+  <meta name="theme-color" content="#110f33">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="محاسبة رمضان">
@@ -18,17 +18,17 @@
 
   <style>
     :root {
-      --bg1: #041513;
-      --bg2: #0b5d4a;
-      --glass: rgba(255, 255, 255, .10);
-      --glass2: rgba(255, 255, 255, .16);
-      --stroke: rgba(255, 255, 255, .18);
-      --text: rgba(255, 255, 255, .92);
-      --muted: rgba(255, 255, 255, .72);
-      --gold: #d8b35a;
-      --mint: #1fbf9a;
-      --shadow: 0 22px 60px rgba(0, 0, 0, .35);
-      --radius: 18px;
+      --bg1: #1a0b2e;
+      --bg2: #110f33;
+      --glass: rgba(255, 255, 255, .08);
+      --glass2: rgba(255, 255, 255, .12);
+      --stroke: rgba(255, 255, 255, .15);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, .65);
+      --gold: #ffb703;
+      --mint: #00f5d4;
+      --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+      --radius: 20px;
     }
 
     * {
@@ -42,108 +42,145 @@
 
     body {
       margin: 0;
-      font-family: 'Tajawal', system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
-      background:
-        radial-gradient(1200px 700px at 15% 10%, rgba(216, 179, 90, .28), transparent 58%),
-        radial-gradient(900px 700px at 90% 20%, rgba(31, 191, 154, .22), transparent 60%),
-        linear-gradient(135deg, var(--bg1), var(--bg2));
+      font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+      background: #110f33;
       color: var(--text);
       overflow-x: hidden;
+      position: relative;
     }
 
-    /* توهج وأشعة متحركة */
+    /* نجوم الخلفية */
+    .stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 10%, white 100%, transparent),
+        radial-gradient(1px 1px at 20% 40%, white 100%, transparent),
+        radial-gradient(2px 2px at 30% 70%, rgba(255, 255, 255, .5) 100%, transparent),
+        radial-gradient(1px 1px at 40% 20%, white 100%, transparent),
+        radial-gradient(1.5px 1.5px at 50% 50%, white 100%, transparent),
+        radial-gradient(1px 1px at 60% 80%, white 100%, transparent),
+        radial-gradient(2px 2px at 70% 30%, rgba(255, 255, 255, .6) 100%, transparent),
+        radial-gradient(1px 1px at 80% 10%, white 100%, transparent),
+        radial-gradient(1px 1px at 90% 60%, white 100%, transparent);
+      background-size: 500px 500px;
+      opacity: 0.4;
+      animation: twinkle 5s linear infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from {
+        opacity: 0.3;
+        transform: translateY(0);
+      }
+
+      to {
+        opacity: 0.6;
+        transform: translateY(-20px);
+      }
+    }
+
+    /* هالة ملونة */
     .glow-layer {
       position: fixed;
-      inset: -30vh -30vw;
+      inset: 0;
       pointer-events: none;
-      filter: blur(24px);
-      opacity: .75;
       z-index: 0;
-    }
-
-    .glow-layer::before,
-    .glow-layer::after {
-      content: "";
-      position: absolute;
-      inset: 0;
       background:
-        radial-gradient(closest-side at 20% 25%, rgba(216, 179, 90, .35), transparent 65%),
-        radial-gradient(closest-side at 80% 20%, rgba(31, 191, 154, .28), transparent 60%),
-        radial-gradient(closest-side at 55% 80%, rgba(255, 255, 255, .10), transparent 70%);
-      animation: floatGlow 10s ease-in-out infinite alternate;
-      transform: translate3d(0, 0, 0);
+        radial-gradient(circle at 10% 10%, rgba(255, 183, 3, 0.15), transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 245, 212, 0.12), transparent 40%);
+      filter: blur(40px);
     }
 
-    .glow-layer::after {
-      background:
-        radial-gradient(closest-side at 30% 70%, rgba(31, 191, 154, .22), transparent 62%),
-        radial-gradient(closest-side at 75% 60%, rgba(216, 179, 90, .24), transparent 62%);
-      animation-duration: 14s;
-      opacity: .8;
-      mix-blend-mode: screen;
-    }
-
-    @keyframes floatGlow {
-      0% {
-        transform: translate(-2%, -1%) scale(1.02) rotate(0deg);
-      }
-
-      100% {
-        transform: translate(2%, 1.5%) scale(1.06) rotate(2deg);
-      }
-    }
-
-    .beams {
+    /* فوانيس رمضان */
+    .lanterns-container {
       position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: .55;
+      top: 0;
+      left: 0;
+      right: 0;
       z-index: 1;
-      mix-blend-mode: screen;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 5vw;
     }
 
-    .beam {
-      position: absolute;
-      width: 55vw;
-      height: 140vh;
-      top: -20vh;
-      left: -10vw;
-      background: linear-gradient(180deg,
-          rgba(216, 179, 90, 0) 0%,
-          rgba(216, 179, 90, .10) 30%,
-          rgba(31, 191, 154, .10) 55%,
-          rgba(216, 179, 90, 0) 100%);
-      transform: rotate(18deg);
-      filter: blur(10px);
-      animation: beamMove 9s linear infinite;
+    .lantern {
+      width: 40px;
+      height: auto;
+      transform-origin: top center;
+      animation: swing 3s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 10px rgba(255, 183, 3, 0.6));
     }
 
-    .beam.b2 {
-      left: 35vw;
-      width: 45vw;
-      transform: rotate(-12deg);
-      animation-duration: 11s;
-      opacity: .45;
-      background: linear-gradient(180deg,
-          rgba(31, 191, 154, 0) 0%,
-          rgba(31, 191, 154, .14) 38%,
-          rgba(216, 179, 90, .10) 58%,
-          rgba(31, 191, 154, 0) 100%);
+    .lantern.l2 {
+      width: 55px;
+      animation-duration: 4s;
+      animation-delay: -1s;
+      margin-top: -10px;
     }
 
-    @keyframes beamMove {
+    .lantern.l3 {
+      width: 35px;
+      animation-duration: 3.5s;
+      animation-delay: -2s;
+      margin-top: 15px;
+    }
+
+    @keyframes swing {
       0% {
-        transform: translateY(-6vh) rotate(18deg);
-        opacity: .30;
-      }
-
-      30% {
-        opacity: .65;
+        transform: rotate(3deg);
       }
 
       100% {
-        transform: translateY(10vh) rotate(18deg);
-        opacity: .35;
+        transform: rotate(-3deg);
+      }
+    }
+
+    /* Lanterns */
+    .lanterns-container {
+      position: fixed;
+      top: -10px;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 2vw;
+      filter: drop-shadow(0 5px 15px rgba(255, 183, 3, 0.3));
+    }
+
+    .lantern {
+      width: 70px;
+      height: auto;
+      transform-origin: 50% 0;
+      animation: swing 3.5s ease-in-out infinite alternate;
+    }
+
+    .lantern.l2 {
+      width: 100px;
+      animation-duration: 4.5s;
+      animation-delay: -1.5s;
+      margin-top: -5px;
+    }
+
+    .lantern.l3 {
+      width: 65px;
+      animation-duration: 4s;
+      animation-delay: -2.5s;
+      margin-top: 15px;
+    }
+
+    @keyframes swing {
+      0% {
+        transform: rotate(5deg);
+      }
+
+      100% {
+        transform: rotate(-5deg);
       }
     }
 
@@ -152,9 +189,10 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      opacity: .16;
+      opacity: .07;
       z-index: 1;
-      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><pattern id="p" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M32 6 L46 20 L58 32 L46 44 L32 58 L18 44 L6 32 L18 20 Z" fill="none" stroke="%23d8b35a" stroke-width="1.2"/><circle cx="32" cy="32" r="6" fill="none" stroke="%23ffffff" stroke-opacity=".35" stroke-width="1"/><path d="M32 14 C42 14 50 22 50 32 C50 42 42 50 32 50 C22 50 14 42 14 32 C14 22 22 14 32 14 Z" fill="none" stroke="%231fbf9a" stroke-opacity=".55" stroke-width="1"/></pattern></defs><rect width="200" height="200" fill="url(%23p)"/></svg>');
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="none" stroke="%23ffb703" stroke-width="1"/></svg>');
+      background-size: 60px 60px;
     }
 
     header {
@@ -162,9 +200,9 @@
       top: 0;
       z-index: 20;
       padding: 14px 12px 12px;
-      backdrop-filter: blur(14px);
-      background: linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .05));
-      border-bottom: 1px solid rgba(255, 255, 255, .12);
+      backdrop-filter: blur(20px);
+      background: rgba(17, 15, 51, 0.6);
+      border-bottom: 1px solid var(--stroke);
     }
 
     .wrap {
@@ -208,28 +246,20 @@
     }
 
     .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 900;
-      background: rgba(255, 255, 255, .10);
-      border: 1px solid rgba(255, 255, 255, .16);
-      color: #fff;
-      white-space: nowrap;
-      box-shadow: 0 10px 22px rgba(0, 0, 0, .14);
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
     }
 
     .chip.gold {
-      background: rgba(216, 179, 90, .14);
-      border-color: rgba(216, 179, 90, .25);
+      background: rgba(255, 183, 3, .15);
+      border-color: rgba(255, 183, 3, .4);
+      color: #ffda75;
     }
 
     .chip.mint {
-      background: rgba(31, 191, 154, .12);
-      border-color: rgba(31, 191, 154, .22);
+      background: rgba(0, 245, 212, .15);
+      border-color: rgba(0, 245, 212, .4);
+      color: #7dfce8;
     }
 
     .icon {
@@ -268,18 +298,27 @@
     }
 
     .card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .10));
-      border: 1px solid rgba(255, 255, 255, .18);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--stroke);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
     }
 
     .cardHead {
-      padding: 12px 12px 10px;
-      background: linear-gradient(135deg, rgba(216, 179, 90, .12), rgba(31, 191, 154, .10));
-      border-bottom: 1px solid rgba(255, 255, 255, .14);
+      padding: 15px;
+      background: linear-gradient(90deg, rgba(255, 183, 3, 0.1), rgba(0, 245, 212, 0.05));
+      border-bottom: 1px solid var(--stroke);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cardHead::before {
+      content: "✦";
+      color: var(--gold);
+      font-size: 18px;
     }
 
     .cardHead h2 {
@@ -299,45 +338,46 @@
     }
 
     .btn {
-      border: 1px solid rgba(255, 255, 255, .18);
-      background: linear-gradient(135deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .08));
-      padding: 11px 12px;
-      border-radius: 14px;
-      font-weight: 900;
-      cursor: pointer;
+      border: 1px solid var(--stroke);
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-weight: 700;
       color: #fff;
-      box-shadow: 0 10px 22px rgba(0, 0, 0, .18);
-      transition: transform .08s ease, filter .15s ease;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: all 0.2s ease;
       position: relative;
       overflow: hidden;
     }
 
-    .btn::after {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, .25), transparent 55%);
-      transform: translateX(-30%);
-      opacity: .0;
-      transition: opacity .2s ease;
-    }
-
-    .btn:hover::after {
-      opacity: .55;
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
     }
 
     .btn:active {
-      transform: scale(.99);
+      transform: translateY(0);
     }
 
     .btn.primary {
-      background: linear-gradient(135deg, rgba(31, 191, 154, .18), rgba(11, 93, 74, .18));
-      border-color: rgba(31, 191, 154, .26);
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.2), rgba(0, 245, 212, 0.05));
+      border-color: rgba(0, 245, 212, 0.4);
+      color: #00f5d4;
+      text-shadow: 0 0 15px rgba(0, 245, 212, 0.5);
+    }
+
+    .btn.primary:hover {
+      background: linear-gradient(135deg, rgba(0, 245, 212, 0.3), rgba(0, 245, 212, 0.1));
+      box-shadow: 0 0 20px rgba(0, 245, 212, 0.2);
     }
 
     .btn.danger {
-      background: linear-gradient(135deg, rgba(255, 107, 107, .18), rgba(216, 179, 90, .08));
-      border-color: rgba(255, 107, 107, .26);
+      background: linear-gradient(135deg, rgba(255, 50, 50, 0.2), rgba(255, 50, 50, 0.05));
+      border-color: rgba(255, 50, 50, 0.4);
+      color: #ff6b6b;
     }
 
     .btn:disabled {
@@ -412,11 +452,15 @@
       justify-content: space-between;
       align-items: center;
       gap: 12px;
-      padding: 12px 12px;
+      padding: 14px;
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, .16);
-      background: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .06));
-      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      transition: background 0.2s;
+    }
+
+    .item:hover {
+      background: rgba(255, 255, 255, 0.06);
     }
 
     .item .meta {
@@ -436,9 +480,33 @@
     }
 
     input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      accent-color: var(--mint);
+      appearance: none;
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--stroke);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    input[type="checkbox"]:checked {
+      background: var(--mint);
+      border-color: var(--mint);
+      box-shadow: 0 0 10px rgba(0, 245, 212, 0.4);
+    }
+
+    input[type="checkbox"]:checked::after {
+      content: "✔";
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      color: #000;
+      font-size: 14px;
+      font-weight: bold;
     }
 
     .scaleBox {
@@ -537,15 +605,17 @@
     }
 
     th {
-      background: linear-gradient(135deg, rgba(216, 179, 90, .18), rgba(31, 191, 154, .12));
+      background: linear-gradient(180deg, rgba(255, 183, 3, 0.15), rgba(255, 183, 3, 0.05));
+      color: var(--gold);
       position: sticky;
       top: 0;
       z-index: 5;
       font-weight: 900;
+      border-bottom: 1px solid var(--gold);
     }
 
     tr:hover td {
-      background: rgba(31, 191, 154, .06);
+      background: rgba(255, 255, 255, 0.05);
     }
 
     .footerNote {
@@ -685,12 +755,44 @@
 </head>
 
 <body>
+  <div class="stars"></div>
   <div class="glow-layer"></div>
-  <div class="beams">
-    <div class="beam"></div>
-    <div class="beam b2"></div>
-  </div>
   <div class="ornament-bg"></div>
+
+  <div class="lanterns-container">
+    <!-- Lantern 1: Hex Fanoos -->
+    <svg class="lantern l1" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 0 L50 30" stroke="#ffb703" stroke-width="2" />
+      <path d="M50 30 L25 50 L75 50 Z" fill="#ffb703" opacity="0.9" />
+      <path d="M25 50 L15 110 L85 110 L75 50 Z" fill="rgba(255,183,3,0.15)" stroke="#ffb703" stroke-width="1.5" />
+      <path d="M40 70 L60 70 L50 90 Z" fill="#ffb703" opacity="0.7" />
+      <path d="M15 110 L50 150 L85 110 Z" fill="#ffb703" opacity="0.9" />
+      <circle cx="50" cy="150" r="4" fill="#ffb703" />
+    </svg>
+
+    <!-- Lantern 2: Crescent Dome -->
+    <svg class="lantern l2" viewBox="0 0 120 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M60 0 L60 40" stroke="#ffb703" stroke-width="2" />
+      <circle cx="60" cy="40" r="4" fill="#ffb703" />
+      <path d="M60 44 L30 70 L90 70 Z" fill="#ffb703" opacity="0.9" />
+      <rect x="30" y="70" width="60" height="80" rx="30" stroke="#ffb703" stroke-width="1.5"
+        fill="rgba(255,183,3,0.1)" />
+      <path d="M60 85 L45 105 L75 105 Z" fill="#ffb703" opacity="0.6" />
+      <path d="M60 135 L45 115 L75 115 Z" fill="#ffb703" opacity="0.6" />
+      <path d="M45 150 L60 170 L75 150 Z" fill="#ffb703" opacity="0.9" />
+      <circle cx="60" cy="170" r="5" fill="#ffb703" />
+    </svg>
+
+    <!-- Lantern 3: Tear Drop -->
+    <svg class="lantern l3" viewBox="0 0 100 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M50 0 L50 25" stroke="#ffb703" stroke-width="2" />
+      <circle cx="50" cy="25" r="3" fill="#ffb703" />
+      <path d="M50 28 L30 50 L70 50 Z" fill="#ffb703" opacity="0.9" />
+      <path d="M30 50 L20 100 L80 100 L70 50 Z" fill="rgba(255,183,3,0.15)" stroke="#ffb703" stroke-width="1.5" />
+      <path d="M20 100 L50 140 L80 100 Z" fill="#ffb703" opacity="0.9" />
+      <circle cx="50" cy="140" r="4" fill="#ffb703" />
+    </svg>
+  </div>
 
   <header>
     <div class="wrap">

@@ -1,5 +1,5 @@
 /* Ramadan Accountability PWA - offline cache */
-const CACHE_NAME = "ramadan-pwa-v2";
+const CACHE_NAME = "ramadan-pwa-v5";
 const ASSETS = [
   "./",
   "./index.html",
