@@ -479,7 +479,7 @@
   const TEMPLATE = {
     days: 30,
     habits: [
-      { key:"morning_adhkar", label:"أذكار الصباح <a href="https://github.com/NaserNajeh/ramazan/blob/main/zad.pdf" target="_blank" rel="noopener" style="color:var(--gold); text-decoration:none; font-weight:1100;">(زاد الذاكر)</a>" },
+      { key:"morning_adhkar", label:"أذكار الصباح <a href="https://github.com/NaserNajeh/ramazan/blob/main/zad.pdf" target="_blank" rel="noopener" style="color:var(--gold); font-weight:1100; text-decoration:none;">(زاد الذاكر)</a> <a href="https://github.com/NaserNajeh/ramazan/blob/main/zad.pdf" target="_blank" rel="noopener" style="color:var(--gold); text-decoration:none; font-weight:1100;">(زاد الذاكر)</a>" },
       { key:"duha_prayer", label:"صلاة الضحى" },
       { key:"kinship", label:"صلة الرحم" },
       { key:"quran_juz", label:"قراءة جزء من القرآن" },
@@ -487,7 +487,7 @@
       { key:"dhikr_200", label:"الذكر 300 مرة ( 100 استغفار ، 100 تهليل ، 100 صلاة على النبي صلى الله عليه وسلم )" },
       { key:"rawatib", label:"السنن الرواتب" },
       { key:"dua", label:"الدعاء" },
-      { key:"evening_adhkar", label:"أذكار المساء" },
+      { key:"evening_adhkar", label:"أذكار المساء <a href="https://github.com/NaserNajeh/ramazan/blob/main/zad.pdf" target="_blank" rel="noopener" style="color:var(--gold); font-weight:1100; text-decoration:none;">(زاد الذاكر)</a>" },
       { key:"taraweeh", label:"صلاة التراويح" },
       { key:"witr", label:"صلاة الوتر" },
       { key:"surah_mulk", label:"قراءة سورة الملك" },
@@ -617,7 +617,7 @@
       const meta = document.createElement("div");
       meta.className = "meta";
       const lab = document.createElement("label");
-      lab.textContent = h.label;
+      lab.innerHTML = h.label;
       const hint = document.createElement("div");
       hint.className = "hint";
       hint.textContent = "تأشير عند الإتمام";
